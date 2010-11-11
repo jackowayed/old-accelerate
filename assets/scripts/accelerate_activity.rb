@@ -12,7 +12,7 @@ $activity.when_launched do |bundle|
   setTitle 'This is the Title'
 
   @sensors = getSystemService Context::SENSOR_SERVICE
-  accelerometers = @sensors.getSensorList(SensorManager::SENSOR_ACCELEROMETER)
+  accelerometers = @sensors.getSensorList(Sensor::TYPE_ACCELEROMETER)
   unless accelerometers.empty?
     @accelerometer = accelerometers[0]
   end
@@ -22,8 +22,14 @@ $activity.when_launched do |bundle|
   end
 
   handle_sensor_changed do |sensor_event|
-    if sensor_event.sensor.getType == Sensor::TYPE_MAGNETIC_FIELD
-      getWindow.setBackgroundDrawable ColorDrawable.new(Color.rgb(rand(255), rand(255), rand(255)))
+    if sensor_event.sensor.getType == Sensor::TYPE_ACCELEROMETER
+      vals = sensor_event.values
+      Log.v "Values", vals[0].to_s
+      Log.v "Values", vals[1].to_s
+      Log.v "Values", vals[2].to_s
+      if Math.sqrt(vals[0] ** 2 + vals[1] ** 2 + vals[2] ** 2) > 12
+        getWindow.setBackgroundDrawable ColorDrawable.new(Color.rgb(rand(255), rand(255), rand(255)))
+      end
     end
   end
 
@@ -36,7 +42,6 @@ $activity.when_launched do |bundle|
     Log.v "SENSORREG", "registered accel"
     @sensors.registerListener self, @accelerometer, SensorManager::SENSOR_DELAY_UI if @accelerometer
   end
-
 end
 
 
